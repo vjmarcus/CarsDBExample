@@ -11,6 +11,9 @@ import androidx.annotation.Nullable;
 import com.freshappbooks.carsdbexample.model.Car;
 import com.freshappbooks.carsdbexample.utils.Util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DatabaseHandler extends SQLiteOpenHelper {
     // Указываем имя
     public DatabaseHandler(@Nullable Context context) {
@@ -31,6 +34,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Util.TABLE_NAME);
         onCreate(db);
     }
+
     public void addCar(Car car) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -42,8 +46,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public Car getCar(int id) {
+        // create db
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(Util.TABLE_NAME, new String[] {Util.KEY_ID, Util.KEY_NAME,
+        Cursor cursor = db.query(Util.TABLE_NAME, new String[]{Util.KEY_ID, Util.KEY_NAME,
                         Util.KEY_PRICE}, Util.KEY_ID + "=?", new String[]{String.valueOf(id)},
                 null, null, null, null);
         if (cursor != null) {
@@ -52,5 +57,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Car car = new Car(Integer.parseInt(cursor.getString(0)), cursor.getString(1),
                 cursor.getString(2));
         return car;
+    }
+
+    public List<Car> getAllCars() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Car> carsList = new ArrayList<>();
+        String selectAllCars = "SELECT * FROM " + Util.TABLE_NAME;
+        Cursor cursor = db.rawQuery(selectAllCars, null);
+        // if cursor have something
+        if (cursor.moveToFirst()) {
+            do {
+                Car car = new Car();
+                car.setId(Integer.parseInt(cursor.getString(0)));
+                car.setName(cursor.getString(1));
+                car.setPrice(cursor.getString(2));
+                carsList.add(car);
+            } while (cursor.moveToNext());
+        }
+        return carsList;
     }
 }
