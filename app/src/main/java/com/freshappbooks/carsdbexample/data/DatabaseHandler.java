@@ -22,10 +22,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        //Create SQL query
         String CREATE_CARS_TABLE = "CREATE TABLE " + Util.TABLE_NAME + "(" +
                 Util.KEY_ID + " INTEGER PRIMARY KEY, " +
                 Util.KEY_NAME + " TEXT, " +
                 Util.KEY_PRICE + " TEXT" + ")";
+        // do SQL query
         db.execSQL(CREATE_CARS_TABLE);
     }
 
@@ -37,6 +39,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void addCar(Car car) {
         SQLiteDatabase db = this.getWritableDatabase();
+        // create one line of table
         ContentValues contentValues = new ContentValues();
         contentValues.put(Util.KEY_NAME, car.getName());
         contentValues.put(Util.KEY_PRICE, car.getPrice());
@@ -75,5 +78,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         return carsList;
+    }
+    public int updateCar(Car car){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Util.KEY_NAME, car.getName());
+        contentValues.put(Util.KEY_PRICE, car.getPrice());
+        return  db.update(Util.TABLE_NAME, contentValues, Util.KEY_ID + "=?",new String []{String.valueOf(car.getId())});
     }
 }
